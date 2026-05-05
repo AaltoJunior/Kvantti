@@ -4,8 +4,7 @@ from qiskit.visualization import plot_histogram
 import matplotlib.pyplot as plt
 
 #Idea lyhyesti: Mittaat ensimmäisen kubitin --> saat 0 tai 1. 
-#Toinen kubitti on välittömästi sama. 
-#Yksittäiset kubitit ovat satunnaisia, mutta yhdessä korreloituja, eli toinen määrittää toisen
+#Ensimmäisen kubitin tila määrittää toisen kubitin tilan
 
 # Luo Bellin tila
 qc = QuantumCircuit(2, 2)
