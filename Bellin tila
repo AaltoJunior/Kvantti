@@ -1,0 +1,27 @@
+from qiskit import QuantumCircuit
+from qiskit_aer import Aer
+from qiskit.visualization import plot_histogram
+import matplotlib.pyplot as plt
+
+#Idea lyhyesti: Mittaat ensimmäisen kubitin --> saat 0 tai 1. 
+#Toinen kubitti on välittömästi sama. 
+#Yksittäiset kubitit ovat satunnaisia, mutta yhdessä korreloituja, eli toinen määrittää toisen
+
+# Luo Bellin tila
+qc = QuantumCircuit(2, 2)
+
+qc.h(0)        # superpositio
+qc.cx(0, 1)    # lomittuminen
+
+qc.measure([0,1], [0,1])
+
+# Simulointi
+sim = Aer.get_backend('qasm_simulator')
+result = sim.run(qc, shots=1000).result()
+counts = result.get_counts()
+
+print("Tulokset:", counts)
+plot_histogram(counts)
+plt.show()
+
+#Tulokset ovat vain 00 ja 11, niiden perässä näkyy montako kertoo tulos esiintyy /1000
