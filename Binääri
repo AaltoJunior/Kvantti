@@ -1,0 +1,5 @@
+luku = int(input("Anna kokonaisluku: "))
+
+binaari = bin(luku)[2:]
+
+print(f"Luku {luku} binäärimuodossa on: {binaari}")
