@@ -1,0 +1,21 @@
+#X-portti kääntää kubitin 0 --> 1 ja 1 --> 0 (kvanttinen NOT)
+
+from qiskit import QuantumCircuit
+from qiskit_aer import Aer
+from qiskit.visualization import plot_histogram
+import matplotlib.pyplot as plt
+
+sim = Aer.get_backend('qasm_simulator')
+
+qc = QuantumCircuit(1,1) #lähtötilanne on aina 0
+
+qc.x(0)        # X-portti
+qc.measure(0,0)
+
+result = sim.run(qc, shots=1000).result()
+counts = result.get_counts()
+
+print("X-portti tulos:", counts)
+plot_histogram(counts)
+plt.show()
+
