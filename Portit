@@ -19,3 +19,16 @@ print("X-portti tulos:", counts)
 plot_histogram(counts)
 plt.show()
 
+# Hadamard-portti
+from qiskit import QuantumCircuit
+from qiskit_aer import Aer
+
+sim = Aer.get_backend('qasm_simulator')
+
+qc = QuantumCircuit(1,1)
+
+qc.h(0)        # Hadamard-portti
+qc.measure(0,0)
+
+result = sim.run(qc, shots=1000).result()
+print("H-portti:", result.get_counts())
