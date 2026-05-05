@@ -19,7 +19,7 @@ print("X-portti tulos:", counts)
 plot_histogram(counts)
 plt.show()
 
-# Hadamard-portti
+# Hadamard-portti ei ole satunnaistaja, vaan lineaarinen muutos.
 from qiskit import QuantumCircuit
 from qiskit_aer import Aer
 
@@ -32,3 +32,30 @@ qc.measure(0,0)
 
 result = sim.run(qc, shots=1000).result()
 print("H-portti:", result.get_counts())
+
+
+# Z-portti ei muuta mittausta suoraan, vaan se muuttaa kvanttivaihetta, joka näkyy vasta kun tilat interferoivat.
+from qiskit import QuantumCircuit
+from qiskit_aer import Aer
+
+sim = Aer.get_backend('qasm_simulator')
+
+def run(name, qc):
+    result = sim.run(qc, shots=1000).result()
+    print(name, result.get_counts())
+
+# ilman Z
+qc1 = QuantumCircuit(1,1)
+qc1.h(0)
+qc1.h(0)
+qc1.measure(0,0)
+
+# Z mukana, ajattele aaltoja
+qc2 = QuantumCircuit(1,1)
+qc2.h(0)                  # jakaa aallon kahteen suuntaan
+qc2.z(0)                  # kääntää yhden aallon "ylösalaisin"
+qc2.h(0)                  # yhdistää aallot takaisin
+qc2.measure(0,0)
+
+run("Ei Z", qc1)
+run("Z mukana", qc2)
