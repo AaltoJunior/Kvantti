@@ -1,0 +1,110 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+from ipywidgets import interact, IntSlider
+from qiskit import QuantumCircuit
+from qiskit.quantum_info import Statevector
+
+# Tämä funktio rakentaa piirin dynaamisesti:
+#
+# H-portti:
+#   - luo superposition
+#   - q0 = (|0> + |1>) / √2
+#
+# CNOT-portti:
+#   - luo korrelaation kahden kubitin välille
+#   - jos q0=1 → flip q1
+# ============================================================
+
+def build_state(use_h, use_cnot):
+
+    qc = QuantumCircuit(2)
+
+    # Hadamard luo superposition ensimmäiseen kubittiin
+    if use_h:
+        qc.h(0)
+
+    # CNOT luo lomittumisen
+    if use_cnot:
+        qc.cx(0, 1)
+
+    # Palautetaan piiri ja statevector
+    return qc, Statevector.from_instruction(qc)
+
+# KORRELAATIOHEATMAP
+# Se näyttää suoraan:
+#   P(00), P(01), P(10), P(11)
+#
+# Lomittuminen = vain diagonaali elää (00 ja 11)
+
+
+def plot_heatmap(state):
+
+    probs = state.probabilities_dict()
+
+    # 2x2 matriisi:
+    # A = ensimmäinen qubit
+    # B = toinen qubit
+    mat = np.array([
+        [probs.get("00", 0), probs.get("01", 0)],
+        [probs.get("10", 0), probs.get("11", 0)]
+    ])
+
+    plt.imshow(mat, cmap="viridis", vmin=0, vmax=1)
+    plt.title("Korrelaatioheatmap (mittaustodennäköisyydet)")
+
+    plt.xticks([0,1], ["A=0", "A=1"])
+    plt.yticks([0,1], ["B=0", "B=1"])
+
+    # kirjoitetaan arvot ruutuihin
+    for i in range(2):
+        for j in range(2):
+            plt.text(j, i, f"{mat[i,j]:.2f}",
+                     ha="center", va="center", color="white")
+
+    plt.show()
+
+# Tämä funktio ajetaan sliderin kautta.
+#
+# Se näyttää:
+# 1. piirin
+# 2. statevectorin
+# 3. korrelaatioheatmapin
+
+def demo(use_h, use_cnot):
+
+    qc, state = build_state(use_h, use_cnot)
+
+    # PIIRI
+    print("\n====================")
+    print("KVANTTIPIIRI")
+    print("====================")
+    print(qc.draw())
+
+    # STATEVECTOR
+    # Tämä on koko systeemin “todellinen tila”
+    print("\n====================")
+    print("STATEVECTOR")
+    print("====================")
+    print(state)
+
+    # KORRELAATIO
+    print("\n====================")
+    print("KORRELAATIO (HEATMAP)")
+    print("====================")
+    plot_heatmap(state)
+
+# INTERAKTIIVINEN SLIDER
+
+# H = superposition
+# CNOT = lomittuminen
+#
+# Näet reaaliajassa:
+# - milloin korrelaatio syntyy
+# - milloin se katoaa
+
+interact(
+    demo,
+    use_h=IntSlider(value=1, min=0, max=1, step=1, description="H"),
+    use_cnot=IntSlider(value=1, min=0, max=1, step=1, description="CNOT")
+)
