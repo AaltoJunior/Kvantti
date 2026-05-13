@@ -52,7 +52,9 @@ ax[0].text(
     fontsize=12
 )
 
-# STATEVECTOR 
+# STATEVECTOR
+# Sisältää kaikki mahdolliset tilat yhtä aikaa, mutta eri amplitudeilla
+# Kun taas klassinen bitti on joko 0 tai 1
 
 ax[1].axis("off")
 ax[1].set_title("Bell-tila |ψ⟩")
