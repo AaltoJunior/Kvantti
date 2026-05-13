@@ -1,0 +1,77 @@
+import matplotlib.pyplot as plt
+
+from qiskit import QuantumCircuit
+from qiskit.quantum_info import Statevector
+from qiskit.visualization import plot_bloch_multivector
+
+# Tämä on kvanttipiiri, joka rakentaa Bell-tilan:
+#
+# |Φ+> = (|00> + |11>) / √2
+#
+# Idea:
+# - H luo superposition
+# - CNOT tekee korrelaation (lomittaa qubitit)
+
+qc = QuantumCircuit(2)
+
+qc.h(0)     # Hadamard: tekee q0:sta superposition
+qc.cx(0,1)  # CNOT: sitoo q0:n ja q1:n yhteen
+
+# Statevector kertoo koko systeemin tilan ennen mittausta.
+#
+# Tämä EI ole klassinen “joko 00 tai 11”,
+# vaan superpositio:
+#
+# |ψ⟩ = (|00⟩ + |11⟩) / √2
+
+state = Statevector.from_instruction(qc)
+
+bloch_fig = plot_bloch_multivector(state)
+
+# Tässä tehdään kaksi näkymää:
+#
+# Vasen:
+# - kvanttipiiri (miten tila rakennetaan)
+#
+# Oikea:
+# - statevector (mitä tila on matemaattisesti)
+
+
+fig, ax = plt.subplots(1, 2, figsize=(12,4))
+
+# PIIRI
+
+ax[0].axis("off")
+ax[0].set_title("Bell-piiri (rakenne)")
+
+# Piirin ASCII-esitys
+ax[0].text(
+    0, 0.5,
+    str(qc.draw()),
+    family="monospace",
+    fontsize=12
+)
+
+# STATEVECTOR 
+
+ax[1].axis("off")
+ax[1].set_title("Bell-tila |ψ⟩")
+
+# Näytetään kvanttitilan vektori
+ax[1].text(
+    0, 0.5,
+    str(state),
+    fontsize=12
+)
+
+plt.tight_layout()
+plt.show()
+
+
+# Tämä avaa erillisen kuvan:
+# - jokainen qubit Bloch-pallolla
+# - lomittuminen näkyy epäsuorasti:
+# - yksittäiset pallot eivät ole “puhdasta suuntaa”
+
+
+bloch_fig
