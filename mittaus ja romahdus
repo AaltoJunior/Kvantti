@@ -1,0 +1,128 @@
+import numpy as np
+from qiskit import QuantumCircuit
+from qiskit.quantum_info import Statevector
+
+
+# ----------------------------
+# Pretty state formatting
+# ----------------------------
+def format_state(state):
+    vec = state.data
+    n = int(np.log2(len(vec)))
+
+    out = []
+    for i, amp in enumerate(vec):
+        if abs(amp) > 1e-10:
+            label = format(i, f"0{n}b")
+
+            # siistit muodot
+            if np.isclose(abs(amp), 1/np.sqrt(2)):
+                amp_str = "1/√2"
+            elif np.isclose(abs(amp), 1):
+                amp_str = "1"
+            else:
+                amp_str = f"{amp.real:.2f}"
+
+            out.append(f"{amp_str} |{label}>")
+
+    return "\n".join(out)
+
+
+# ----------------------------
+# 1. H-portti
+# ----------------------------
+def step_1_h():
+    print("\n======================")
+    print("VAIHE 1: H-PORTTI")
+    print("======================")
+
+    qc = QuantumCircuit(1)
+    qc.h(0)
+
+    print(qc.draw())
+
+    state = Statevector.from_instruction(qc)
+
+    print("\nSTATEVECTOR:")
+    print(format_state(state))
+
+    return state
+
+
+
+# 2. Mittaus (ennen romahdusta)
+
+def step_2_measure_circuit():
+    print("\n======================")
+    print("VAIHE 2: MITTAUSPIIRI")
+    print("======================")
+
+    qc = QuantumCircuit(1, 1)
+    qc.h(0)
+    qc.measure(0, 0)
+
+    print(qc.draw())
+
+    return qc
+
+
+
+# 3. Romahdus
+
+def step_3_collapse(state):
+    print("\n======================")
+    print("VAIHE 3: ROMAHDUS")
+    print("======================")
+
+    probs = state.probabilities_dict()
+
+    outcome = np.random.choice(
+        list(probs.keys()),
+        p=list(probs.values())
+    )
+
+    collapsed = Statevector.from_label(outcome)
+
+    print("MITTAUSTULOS:", outcome)
+
+    print("\nROMAHTANUT TILA:")
+    print(format_state(collapsed))
+
+
+# ----------------------------
+# RUN ALL STEPS
+# ----------------------------
+def run_demo():
+    state = step_1_h()
+    step_2_measure_circuit()
+    step_3_collapse(state)
+
+
+run_demo()
+# MITTAUS:
+# Mittaus tarkoittaa sitä, että kvanttitila “pakotetaan” yhdeksi selkeäksi vastaukseksi: 0 tai 1.
+#
+# Ennen mittausta kubitti voi olla superpositiossa:
+#   esim. (|0> + |1>) / √2
+#
+# Mittauksessa:
+# - Mitataan tulos todennäköisyyksien mukaan
+# - Superpositio ei enää näy mittauksen jälkeen
+
+
+# ROMAHDUS:
+# Romahdus tarkoittaa sitä hetkeä, kun superpositio katoaa.
+#
+# Esimerkki:
+#   ennen: (|0> + |1>) / √2
+#   jälkeen: |0>  TAI  |1>
+#
+# Kaikki muut mahdollisuudet “katoavat” mittauksen jälkeen.
+# Jäljelle jää vain yksi lopullinen tila.
+
+
+# INTUITIO:
+# Ajattele kubittia kuin kolikkoa ilmassa:
+# - ennen mittausta: se ei ole kruuna eikä klaava (se on “molempia”)
+# - mittauksessa: kolikko putoaa maahan
+# - jälkeen: näet vain yhden tuloksen
