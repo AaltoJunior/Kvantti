@@ -111,3 +111,18 @@ interact(
         description="Bell"
     )
 )
+print("""
+Hadamard-portti (H)
+-avaa kvanttitilan
+-tekee 0 ja 1 yhtä todennäköisiä
+-mahdollistaa superposition
+
+CNOT-portti
+-jos kontrolli (0) = 1 --> kääntää kohteen.
+-jos kontrolli = 0 --> ei muutosta.
+-ainoa tapa luoda lomittuminen
+
+Z-portti
+-peilaa vain signaalin vaiheen.
+-mahdollistaa superpositiot
+""")
