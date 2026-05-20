@@ -1,4 +1,4 @@
 simulaatio aer mittaukseen virtapiirin alapuolelle
 bloch palloon useampi vektori, pakota 1
 bellin tilat sanallisesti, vaihda statevector, 00 ja 11 samaan. wikipedia bell state muoto
-https://quantum.cloud.ibm.com/docs/en/api/qiskit/qiskit.visualization.plot_bloch_multivector, käytä statevector
+https://quantum.cloud.ibm.com/docs/en/api/qiskit/qiskit.visualization.plot_bloch_multivector, käytä statevector, näytä H superpositio
