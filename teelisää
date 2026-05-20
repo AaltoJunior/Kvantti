@@ -1,8 +1,2 @@
-ensin h-portti, sitten mittaus ja näkyy miten romahtaa
-selitä portit ja cnot mappaus
-bloch-pallo, pauli x,y,z vektorina, phase gate rotaationa, sliderina
-controlled Z, muuta (-) kivaan muotoon desimaalin sijaan
-muuta 0.71 tai 1/sqrt(2) eikä pelottava desimaali
-muuta statevector muoto järkevään
-simulaatio aer
+simulaatio aer mittaukseen virtapiirin alapuolelle
 
