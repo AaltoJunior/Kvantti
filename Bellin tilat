@@ -1,0 +1,113 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+from qiskit import QuantumCircuit
+from qiskit.quantum_info import Statevector
+from sympy import nsimplify, simplify
+from ipywidgets import interact, Dropdown
+
+
+# -----------------------------
+# STATEVECTOR FORMATOINTI
+# -----------------------------
+def format_amp(amp):
+    val = nsimplify(amp, tolerance=1e-10)  # EI rational=True
+    val = simplify(val)
+
+    # pakotetaan siisti √2-muoto Bell-tiloille
+    if abs(abs(amp) - 1/np.sqrt(2)) < 1e-8:
+        return "1/sqrt(2)" if amp.real > 0 else "-1/sqrt(2)"
+
+    return val
+
+
+def print_state(state):
+    labels = ["00", "01", "10", "11"]
+    for amp, label in zip(state.data, labels):
+        print(f"|{label}> : {format_amp(amp)}")
+
+
+# -----------------------------
+# BELL-TILAT
+# -----------------------------
+def bell_state(name):
+
+    qc = QuantumCircuit(2)
+
+    if name in ["Φ⁺", "Φ⁻"]:
+        qc.h(0)
+        qc.cx(0, 1)
+
+    if name == "Φ⁻":
+        qc.z(0)
+
+    if name in ["Ψ⁺", "Ψ⁻"]:
+        qc.h(0)
+        qc.cx(0, 1)
+        qc.x(1)
+
+    if name == "Ψ⁻":
+        qc.z(0)
+
+    state = Statevector.from_instruction(qc)
+    return qc, state
+
+
+# -----------------------------
+# HEATMAP
+# -----------------------------
+def plot_heatmap(state):
+
+    probs = state.probabilities_dict()
+
+    mat = np.array([
+        [probs.get("00", 0), probs.get("01", 0)],
+        [probs.get("10", 0), probs.get("11", 0)]
+    ])
+
+    plt.imshow(mat, cmap="viridis", vmin=0, vmax=1)
+    plt.title("Korrelaatioheatmap")
+
+    plt.xticks([0,1], ["A=0", "A=1"])
+    plt.yticks([0,1], ["B=0", "B=1"])
+
+    for i in range(2):
+        for j in range(2):
+            plt.text(j, i, f"{mat[i,j]:.2f}",
+                     ha="center", va="center", color="white")
+
+    plt.show()
+
+
+# -----------------------------
+# DEMO
+# -----------------------------
+def demo(state_name):
+
+    qc, state = bell_state(state_name)
+
+    print("\n====================")
+    print("BELL-TILA:", state_name)
+    print("====================")
+
+    print("\nKVANTTIPIIRI")
+    print(qc.draw())
+
+    print("\nSTATEVECTOR")
+    print_state(state)
+
+    print("\nHEATMAP")
+    plot_heatmap(state)
+
+
+# -----------------------------
+# INTERAKTIIVINEN VALITSIN
+# -----------------------------
+interact(
+    demo,
+    state_name=Dropdown(
+        options=["Φ⁺", "Φ⁻", "Ψ⁺", "Ψ⁻"],
+        value="Φ⁺",
+        description="Bell"
+    )
+)
