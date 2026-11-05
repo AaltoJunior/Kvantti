@@ -81,52 +81,66 @@ bloch_fig
 2. versio
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Statevector
-from qiskit.visualization import plot_bloch_multivector
+from qiskit.visualization import Bloch
 
-# Tämä on kvanttipiiri, joka rakentaa Bell-tilan:
-#
-# |Φ+> = (|00> + |11>) / √2
-#
-# Idea:
-# - H luo superposition
-# - CNOT tekee korrelaation (lomittaa qubitit)
+# ==========================================
+# 1. RAKENNA KVANTTIPIIRI
+# ==========================================
 
 qc = QuantumCircuit(2)
 
-qc.h(0)     # Hadamard: tekee q0:sta superposition
-qc.cx(0,1)  # CNOT: sitoo q0:n ja q1:n yhteen
+qc.h(0)
+qc.cx(0, 1)
 
-# Statevector kertoo koko systeemin tilan ennen mittausta.
-#
-# Tämä EI ole klassinen “joko 00 tai 11”,
-# vaan superpositio:
-#
-# |ψ⟩ = (|00⟩ + |11⟩) / √2
-
+# Statevector
 state = Statevector.from_instruction(qc)
 
-bloch_fig = plot_bloch_multivector(state)
+# ==========================================
+# 2. LISÄÄ OMAT BLOCH-VEKTORIT TÄSSÄ
+# ==========================================
 
-# Tässä tehdään kaksi näkymää:
+# Muoto: [x, y, z]
 #
-# Vasen:
-# - kvanttipiiri (miten tila rakennetaan)
+# Esimerkkejä:
+# [1, 0, 0]   = +X
+# [0, 1, 0]   = +Y
+# [0, 0, 1]   = +Z
+# [-1, 0, 0]  = -X
+# [0, 0, -1]  = -Z
 #
-# Oikea:
-# - statevector (mitä tila on matemaattisesti)
+# Voit lisätä niin monta vektoria kuin haluat.
 
+VEKTORIT = [
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1],
+    [-1, 0, 0],
+]
 
-fig, ax = plt.subplots(1, 2, figsize=(12,4))
+# ==========================================
+# 3. LUO BLOCH-PALLO
+# ==========================================
 
-# PIIRI
+bloch = Bloch()
 
+# Lisää vektorit palloon
+for v in VEKTORIT:
+    bloch.add_vectors(v)
+
+# ==========================================
+# 4. PIIRRÄ KVANTTIPIIRI JA STATEVECTOR
+# ==========================================
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+
+# Kvanttipiiri
 ax[0].axis("off")
-ax[0].set_title("Bell-piiri (rakenne)")
+ax[0].set_title("Bell-piiri")
 
-# Piirin ASCII-esitys
 ax[0].text(
     0, 0.5,
     str(qc.draw()),
@@ -134,14 +148,10 @@ ax[0].text(
     fontsize=12
 )
 
-# STATEVECTOR
-# Sisältää kaikki mahdolliset tilat yhtä aikaa, mutta eri amplitudeilla
-# Kun taas klassinen bitti on joko 0 tai 1
-
+# Statevector
 ax[1].axis("off")
 ax[1].set_title("Bell-tila |ψ⟩")
 
-# Näytetään kvanttitilan vektori
 ax[1].text(
     0, 0.5,
     str(state),
@@ -151,11 +161,8 @@ ax[1].text(
 plt.tight_layout()
 plt.show()
 
+# ==========================================
+# 5. NÄYTÄ BLOCH-PALLO
+# ==========================================
 
-# Tämä avaa erillisen kuvan:
-# - jokainen qubit Bloch-pallolla
-# - lomittuminen näkyy epäsuorasti:
-# - yksittäiset pallot eivät ole “puhdasta suuntaa”
-
-
-bloch_fig
+bloch.show()
